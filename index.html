@@ -3,20 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --page: #ded1bd;
-  --dark: #33231d;
-  --panel: #504237;
-  --blue: #6f9fc1;
   --ink: #3f332b;
   --muted: #68584b;
   --soft: #817160;
   --cream: #f2e8d8;
   --cover-border: #a89580;
+  --accent: #5f86a0;
 }
 
 * {
@@ -84,7 +79,7 @@ a {
   display: inline-block;
   margin-bottom: 2px;
   padding: 1px 3px 2px;
-  background: #5f86a0;
+  background: var(--accent);
   color: var(--cream);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 6.5px;
@@ -101,7 +96,6 @@ a {
   font-size: 8px;
   font-weight: 400;
   line-height: 1.05;
-  letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -130,27 +124,12 @@ a {
   color: #746454;
 }
 
-.lastfm-widget:hover .song {
-  color: #3a2e27;
-}
-
-.lastfm-widget:hover .cover-wrap img {
-  filter:
-    grayscale(.36)
-    sepia(.48)
-    saturate(.42)
-    brightness(.91)
-    contrast(1.02);
-}
-
 .loading,
 .error {
   background: transparent;
   color: var(--soft);
   padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 7px;
-  font-weight: 400;
 }
 </style>
 </head>
@@ -173,14 +152,7 @@ a {
 <script>
 const LASTFM_USERNAME = "deofi";
 const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
-
-const API_URL =
-  "https://ws.audioscrobbler.com/2.0/?" +
-  "method=user.getrecenttracks" +
-  "&user=" + encodeURIComponent(LASTFM_USERNAME) +
-  "&api_key=" + encodeURIComponent(LASTFM_API_KEY) +
-  "&format=json" +
-  "&limit=1";
+const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
 
 const coverEl = document.getElementById("cover");
 const statusEl = document.getElementById("status");
@@ -188,6 +160,19 @@ const songEl = document.getElementById("song");
 const artistEl = document.getElementById("artist");
 const albumEl = document.getElementById("album");
 const linkEl = document.getElementById("lastfm-link");
+
+function buildApiUrl() {
+  const params = new URLSearchParams({
+    method: "user.getrecenttracks",
+    user: LASTFM_USERNAME,
+    api_key: LASTFM_API_KEY,
+    format: "json",
+    limit: "5"
+  });
+
+  params.set("_", String(Date.now()));
+  return "https://ws.audioscrobbler.com/2.0/?" + params.toString();
+}
 
 function sendHeight() {
   window.parent.postMessage(
@@ -203,66 +188,101 @@ function getBestImage(images) {
   if (!Array.isArray(images)) return "";
 
   const usable = images
-    .map(image => image["#text"])
+    .map(image => image && image["#text"])
     .filter(Boolean);
 
   return usable[usable.length - 1] || "";
 }
 
+function normalizeTracks(data) {
+  const raw = data?.recenttracks?.track;
+  if (!raw) return [];
+  return Array.isArray(raw) ? raw : [raw];
+}
+
+function getNewestTrack(tracks) {
+  if (!tracks.length) return null;
+
+  const nowPlaying = tracks.find(
+    track => track?.["@attr"]?.nowplaying === "true"
+  );
+
+  if (nowPlaying) return nowPlaying;
+
+  return [...tracks].sort((a, b) => {
+    const aTime = Number(a?.date?.uts || 0);
+    const bTime = Number(b?.date?.uts || 0);
+    return bTime - aTime;
+  })[0] || null;
+}
+
+function renderTrack(track) {
+  const isNowPlaying = track?.["@attr"]?.nowplaying === "true";
+  const song = track?.name || "unknown song";
+  const artist = track?.artist?.["#text"] || track?.artist?.name || "unknown artist";
+  const album = track?.album?.["#text"] || "";
+  const image = getBestImage(track?.image);
+
+  statusEl.textContent = isNowPlaying ? "now playing" : "last played";
+  statusEl.classList.remove("loading", "error");
+
+  songEl.textContent = song;
+  artistEl.textContent = artist;
+  albumEl.textContent = album ? "album: " + album : "";
+
+  coverEl.src = image || FALLBACK_COVER;
+  linkEl.href = track?.url || ("https://www.last.fm/user/" + LASTFM_USERNAME);
+
+  requestAnimationFrame(sendHeight);
+}
+
 async function loadLastfm() {
   try {
-    const response = await fetch(API_URL + "&cache=" + Date.now());
+    const response = await fetch(buildApiUrl(), {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
 
     if (!response.ok) {
-      throw new Error("Last.fm request failed");
+      throw new Error("HTTP " + response.status);
     }
 
     const data = await response.json();
-    const track = data?.recenttracks?.track?.[0];
+
+    if (data?.error) {
+      throw new Error(data.message || "Last.fm API error");
+    }
+
+    const tracks = normalizeTracks(data);
+    const track = getNewestTrack(tracks);
 
     if (!track) {
-      throw new Error("No track found");
+      throw new Error("No recent track found");
     }
 
-    const isNowPlaying = track["@attr"]?.nowplaying === "true";
-    const song = track.name || "unknown song";
-    const artist = track.artist?.["#text"] || "unknown artist";
-    const album = track.album?.["#text"] || "";
-    const image = getBestImage(track.image);
-
-    statusEl.textContent = isNowPlaying ? "now playing" : "last played";
-    statusEl.classList.remove("loading", "error");
-
-    songEl.textContent = song;
-    artistEl.textContent = artist;
-    albumEl.textContent = album ? "album: " + album : "";
-
-    if (image) {
-      coverEl.src = image;
-    }
-
-    if (track.url) {
-      linkEl.href = track.url;
-    }
-
-    requestAnimationFrame(sendHeight);
-    setTimeout(sendHeight, 100);
+    renderTrack(track);
   } catch (error) {
     statusEl.textContent = "last.fm unavailable";
     statusEl.classList.remove("loading");
     statusEl.classList.add("error");
-
     songEl.textContent = "could not load song";
     artistEl.textContent = "";
     albumEl.textContent = "";
-
+    coverEl.src = FALLBACK_COVER;
     requestAnimationFrame(sendHeight);
   }
 }
 
 loadLastfm();
-setInterval(loadLastfm, 60000);
+setInterval(loadLastfm, 15000);
 
+window.addEventListener("focus", loadLastfm);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) loadLastfm();
+});
 window.addEventListener("load", sendHeight);
 window.addEventListener("resize", sendHeight);
 
