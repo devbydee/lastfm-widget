@@ -12,11 +12,11 @@
   --dark: #33231d;
   --panel: #504237;
   --blue: #6f9fc1;
-  --ink: #4f4136;
-  --muted: #7f6e5f;
-  --soft: #9a8878;
-  --cream: #f5eddf;
-  --cover-border: #b7a58f;
+  --ink: #3f332b;
+  --muted: #68584b;
+  --soft: #817160;
+  --cream: #f2e8d8;
+  --cover-border: #a89580;
 }
 
 * {
@@ -49,14 +49,14 @@ a {
   width: 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 7px;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 6px;
   align-items: center;
 }
 
 .cover-wrap {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   overflow: hidden;
   background: var(--page);
   border: 1px solid var(--cover-border);
@@ -68,11 +68,11 @@ a {
   height: 100%;
   object-fit: cover;
   filter:
-    grayscale(.35)
-    sepia(.46)
-    saturate(.46)
-    brightness(.95)
-    contrast(.97);
+    grayscale(.42)
+    sepia(.52)
+    saturate(.38)
+    brightness(.88)
+    contrast(1.02);
 }
 
 .track-info {
@@ -83,24 +83,25 @@ a {
 .now-playing {
   display: inline-block;
   margin-bottom: 2px;
-  padding: 1px 4px 2px;
-  background: var(--blue);
+  padding: 1px 3px 2px;
+  background: #5f86a0;
   color: var(--cream);
-  font-family: "Work Sans", Arial, sans-serif;
-  font-size: 7px;
-  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 6.5px;
+  font-weight: 400;
   line-height: 1;
   white-space: nowrap;
 }
 
 .song {
   display: block;
-  max-width: 100%;
-  color: var(--dark);
-  font-family: "Work Sans", Arial, sans-serif;
-  font-size: 9px;
-  font-weight: 600;
+  max-width: 145px;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8px;
+  font-weight: 400;
   line-height: 1.05;
+  letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -112,34 +113,34 @@ a {
   max-width: 100%;
   color: var(--muted);
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 7px;
+  font-size: 6.5px;
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1.08;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .artist {
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .album {
   margin-top: 1px;
-  color: var(--soft);
+  color: #746454;
 }
 
 .lastfm-widget:hover .song {
-  color: #2f241d;
+  color: #3a2e27;
 }
 
 .lastfm-widget:hover .cover-wrap img {
   filter:
-    grayscale(.24)
-    sepia(.40)
-    saturate(.54)
-    brightness(.98)
-    contrast(.98);
+    grayscale(.36)
+    sepia(.48)
+    saturate(.42)
+    brightness(.91)
+    contrast(1.02);
 }
 
 .loading,
