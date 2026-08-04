@@ -159,19 +159,6 @@
     const albumEl = document.getElementById("album");
     const linkEl = document.getElementById("lastfm-link");
 
-    const applyTheme = theme => {
-      document.documentElement.classList.toggle("dark", theme === "dark");
-    };
-
-    const savedTheme = localStorage.getItem("hiddentrack-theme");
-    applyTheme(savedTheme === "dark" ? "dark" : "light");
-
-    window.addEventListener("message", event => {
-      if (event.data?.type === "d-lastfm-theme") {
-        applyTheme(event.data.theme);
-      }
-    });
-
     function buildApiUrl() {
       const params = new URLSearchParams({
         method: "user.getrecenttracks",
@@ -183,16 +170,6 @@
 
       params.set("_", String(Date.now()));
       return "https://ws.audioscrobbler.com/2.0/?" + params.toString();
-    }
-
-    function sendHeight() {
-      window.parent.postMessage(
-        {
-          type: "d-lastfm-height",
-          height: Math.ceil(document.documentElement.scrollHeight)
-        },
-        "*"
-      );
     }
 
     function getBestImage(images) {
@@ -242,7 +219,6 @@
       coverEl.src = image || FALLBACK_COVER;
       linkEl.href = track?.url || ("https://www.last.fm/user/" + LASTFM_USERNAME);
 
-      requestAnimationFrame(sendHeight);
     }
 
     async function loadLastfm() {
@@ -281,8 +257,7 @@
         artistEl.textContent = "";
         albumEl.textContent = "";
         coverEl.src = FALLBACK_COVER;
-        requestAnimationFrame(sendHeight);
-      }
+        }
     }
 
     loadLastfm();
@@ -292,12 +267,6 @@
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) loadLastfm();
     });
-    window.addEventListener("load", sendHeight);
-    window.addEventListener("resize", sendHeight);
-
-    if ("ResizeObserver" in window) {
-      new ResizeObserver(sendHeight).observe(document.body);
-    }
   </script>
 </body>
 </html>
