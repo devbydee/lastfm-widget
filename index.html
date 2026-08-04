@@ -1,294 +1,303 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-:root {
-  --page: #ded1bd;
-  --ink: #3f332b;
-  --muted: #68584b;
-  --soft: #817160;
-  --cream: #f2e8d8;
-  --cover-border: #a89580;
-  --accent: #5f86a0;
-}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --cream: #eee9dc;
+      --red: #8b4741;
+      --soft-red: #a06d68;
+      --line: rgba(139, 71, 65, .22);
+    }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+    html.dark {
+      --cream: #262220;
+      --red: #d3aaa5;
+      --soft-red: #a9827e;
+      --line: rgba(211, 170, 165, .2);
+    }
 
-html,
-body {
-  width: 100%;
-  min-height: 100%;
-  background: transparent;
-  overflow: hidden;
-}
+    * {
+      box-sizing: border-box;
+      cursor: url("https://cdn.cursors-4u.net/previews/tiny-grey-pointer-544443a3-32.webp") 32 32, auto !important;
+    }
 
-body {
-  color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  font-weight: 400;
-}
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+    }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+    body {
+      color: var(--red);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10px;
+      line-height: 1.2;
+    }
 
-.lastfm-widget {
-  width: 100%;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  gap: 6px;
-  align-items: center;
-}
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-.cover-wrap {
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
-  background: var(--page);
-  border: 1px solid var(--cover-border);
-}
+    .lastfm-widget {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      min-width: 0;
+    }
 
-.cover-wrap img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter:
-    grayscale(.42)
-    sepia(.52)
-    saturate(.38)
-    brightness(.88)
-    contrast(1.02);
-}
+    .cover-wrap {
+      width: 52px;
+      height: 52px;
+      overflow: hidden;
+      background: var(--cream);
+      outline: 1px solid var(--line);
+      outline-offset: -1px;
+    }
 
-.track-info {
-  min-width: 0;
-  overflow: hidden;
-}
+    .cover-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(.2) sepia(.22) saturate(.72) brightness(.98) contrast(.96);
+    }
 
-.now-playing {
-  display: inline-block;
-  margin-bottom: 2px;
-  padding: 1px 3px 2px;
-  background: var(--accent);
-  color: var(--cream);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 6.5px;
-  font-weight: 400;
-  line-height: 1;
-  white-space: nowrap;
-}
+    html.dark .cover-wrap img {
+      filter: grayscale(.28) sepia(.18) saturate(.62) brightness(.72) contrast(.98);
+    }
 
-.song {
-  display: block;
-  max-width: 145px;
-  color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 8px;
-  font-weight: 400;
-  line-height: 1.05;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .track-info {
+      min-width: 0;
+      overflow: hidden;
+    }
 
-.artist,
-.album {
-  display: block;
-  max-width: 100%;
-  color: var(--muted);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 6.5px;
-  font-weight: 400;
-  line-height: 1.08;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .now-playing {
+      display: inline-block;
+      margin-bottom: 3px;
+      padding: 1px 4px 2px;
+      background: var(--red);
+      color: var(--cream);
+      font-size: 8px;
+      line-height: 1;
+      white-space: nowrap;
+    }
 
-.artist {
-  margin-top: 1px;
-}
+    .song {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.12;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-.album {
-  margin-top: 1px;
-  color: #746454;
-}
+    .artist,
+    .album {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      color: var(--soft-red);
+      font-size: 9px;
+      line-height: 1.12;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-.loading,
-.error {
-  background: transparent;
-  color: var(--soft);
-  padding: 0;
-  font-size: 7px;
-}
-</style>
+    .artist {
+      margin-top: 2px;
+    }
+
+    .album {
+      margin-top: 1px;
+    }
+
+    .loading,
+    .error {
+      background: transparent;
+      color: var(--soft-red);
+      padding: 0;
+    }
+  </style>
 </head>
+
 <body>
-<a id="lastfm-link" href="https://www.last.fm/user/deofi" target="_blank" rel="noopener noreferrer">
-  <div class="lastfm-widget">
-    <div class="cover-wrap">
-      <img id="cover" src="https://cdn.imgchest.com/files/e47cd02d0ccb.gif" alt="album cover">
+  <a id="lastfm-link" href="https://www.last.fm/user/deofi" target="_blank" rel="noopener noreferrer">
+    <div class="lastfm-widget">
+      <div class="cover-wrap">
+        <img id="cover" src="https://cdn.imgchest.com/files/e47cd02d0ccb.gif" alt="album cover">
+      </div>
+
+      <div class="track-info">
+        <div id="status" class="now-playing loading">loading last.fm...</div>
+        <div id="song" class="song">...</div>
+        <div id="artist" class="artist"></div>
+        <div id="album" class="album"></div>
+      </div>
     </div>
+  </a>
 
-    <div class="track-info">
-      <div id="status" class="now-playing loading">loading last.fm...</div>
-      <div id="song" class="song">...</div>
-      <div id="artist" class="artist"></div>
-      <div id="album" class="album"></div>
-    </div>
-  </div>
-</a>
+  <script>
+    const LASTFM_USERNAME = "deofi";
+    const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
+    const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
 
-<script>
-const LASTFM_USERNAME = "deofi";
-const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
-const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
+    const coverEl = document.getElementById("cover");
+    const statusEl = document.getElementById("status");
+    const songEl = document.getElementById("song");
+    const artistEl = document.getElementById("artist");
+    const albumEl = document.getElementById("album");
+    const linkEl = document.getElementById("lastfm-link");
 
-const coverEl = document.getElementById("cover");
-const statusEl = document.getElementById("status");
-const songEl = document.getElementById("song");
-const artistEl = document.getElementById("artist");
-const albumEl = document.getElementById("album");
-const linkEl = document.getElementById("lastfm-link");
+    const applyTheme = theme => {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    };
 
-function buildApiUrl() {
-  const params = new URLSearchParams({
-    method: "user.getrecenttracks",
-    user: LASTFM_USERNAME,
-    api_key: LASTFM_API_KEY,
-    format: "json",
-    limit: "5"
-  });
+    const savedTheme = localStorage.getItem("hiddentrack-theme");
+    applyTheme(savedTheme === "dark" ? "dark" : "light");
 
-  params.set("_", String(Date.now()));
-  return "https://ws.audioscrobbler.com/2.0/?" + params.toString();
-}
-
-function sendHeight() {
-  window.parent.postMessage(
-    {
-      type: "d-lastfm-height",
-      height: Math.ceil(document.documentElement.scrollHeight)
-    },
-    "*"
-  );
-}
-
-function getBestImage(images) {
-  if (!Array.isArray(images)) return "";
-
-  const usable = images
-    .map(image => image && image["#text"])
-    .filter(Boolean);
-
-  return usable[usable.length - 1] || "";
-}
-
-function normalizeTracks(data) {
-  const raw = data?.recenttracks?.track;
-  if (!raw) return [];
-  return Array.isArray(raw) ? raw : [raw];
-}
-
-function getNewestTrack(tracks) {
-  if (!tracks.length) return null;
-
-  const nowPlaying = tracks.find(
-    track => track?.["@attr"]?.nowplaying === "true"
-  );
-
-  if (nowPlaying) return nowPlaying;
-
-  return [...tracks].sort((a, b) => {
-    const aTime = Number(a?.date?.uts || 0);
-    const bTime = Number(b?.date?.uts || 0);
-    return bTime - aTime;
-  })[0] || null;
-}
-
-function renderTrack(track) {
-  const isNowPlaying = track?.["@attr"]?.nowplaying === "true";
-  const song = track?.name || "unknown song";
-  const artist = track?.artist?.["#text"] || track?.artist?.name || "unknown artist";
-  const album = track?.album?.["#text"] || "";
-  const image = getBestImage(track?.image);
-
-  statusEl.textContent = isNowPlaying ? "now playing" : "last played";
-  statusEl.classList.remove("loading", "error");
-
-  songEl.textContent = song;
-  artistEl.textContent = artist;
-  albumEl.textContent = album ? "album: " + album : "";
-
-  coverEl.src = image || FALLBACK_COVER;
-  linkEl.href = track?.url || ("https://www.last.fm/user/" + LASTFM_USERNAME);
-
-  requestAnimationFrame(sendHeight);
-}
-
-async function loadLastfm() {
-  try {
-    const response = await fetch(buildApiUrl(), {
-      method: "GET",
-      cache: "no-store",
-      headers: {
-        "Accept": "application/json"
+    window.addEventListener("message", event => {
+      if (event.data?.type === "d-lastfm-theme") {
+        applyTheme(event.data.theme);
       }
     });
 
-    if (!response.ok) {
-      throw new Error("HTTP " + response.status);
+    function buildApiUrl() {
+      const params = new URLSearchParams({
+        method: "user.getrecenttracks",
+        user: LASTFM_USERNAME,
+        api_key: LASTFM_API_KEY,
+        format: "json",
+        limit: "5"
+      });
+
+      params.set("_", String(Date.now()));
+      return "https://ws.audioscrobbler.com/2.0/?" + params.toString();
     }
 
-    const data = await response.json();
-
-    if (data?.error) {
-      throw new Error(data.message || "Last.fm API error");
+    function sendHeight() {
+      window.parent.postMessage(
+        {
+          type: "d-lastfm-height",
+          height: Math.ceil(document.documentElement.scrollHeight)
+        },
+        "*"
+      );
     }
 
-    const tracks = normalizeTracks(data);
-    const track = getNewestTrack(tracks);
+    function getBestImage(images) {
+      if (!Array.isArray(images)) return "";
 
-    if (!track) {
-      throw new Error("No recent track found");
+      const usable = images
+        .map(image => image && image["#text"])
+        .filter(Boolean);
+
+      return usable[usable.length - 1] || "";
     }
 
-    renderTrack(track);
-  } catch (error) {
-    statusEl.textContent = "last.fm unavailable";
-    statusEl.classList.remove("loading");
-    statusEl.classList.add("error");
-    songEl.textContent = "could not load song";
-    artistEl.textContent = "";
-    albumEl.textContent = "";
-    coverEl.src = FALLBACK_COVER;
-    requestAnimationFrame(sendHeight);
-  }
-}
+    function normalizeTracks(data) {
+      const raw = data?.recenttracks?.track;
+      if (!raw) return [];
+      return Array.isArray(raw) ? raw : [raw];
+    }
 
-loadLastfm();
-setInterval(loadLastfm, 15000);
+    function getNewestTrack(tracks) {
+      if (!tracks.length) return null;
 
-window.addEventListener("focus", loadLastfm);
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) loadLastfm();
-});
-window.addEventListener("load", sendHeight);
-window.addEventListener("resize", sendHeight);
+      const nowPlaying = tracks.find(
+        track => track?.["@attr"]?.nowplaying === "true"
+      );
 
-if ("ResizeObserver" in window) {
-  new ResizeObserver(sendHeight).observe(document.body);
-}
-</script>
+      if (nowPlaying) return nowPlaying;
+
+      return [...tracks].sort((a, b) => {
+        const aTime = Number(a?.date?.uts || 0);
+        const bTime = Number(b?.date?.uts || 0);
+        return bTime - aTime;
+      })[0] || null;
+    }
+
+    function renderTrack(track) {
+      const isNowPlaying = track?.["@attr"]?.nowplaying === "true";
+      const song = track?.name || "unknown song";
+      const artist = track?.artist?.["#text"] || track?.artist?.name || "unknown artist";
+      const album = track?.album?.["#text"] || "";
+      const image = getBestImage(track?.image);
+
+      statusEl.textContent = isNowPlaying ? "now playing" : "last played";
+      statusEl.classList.remove("loading", "error");
+      songEl.textContent = song;
+      artistEl.textContent = artist;
+      albumEl.textContent = album;
+      coverEl.src = image || FALLBACK_COVER;
+      linkEl.href = track?.url || ("https://www.last.fm/user/" + LASTFM_USERNAME);
+
+      requestAnimationFrame(sendHeight);
+    }
+
+    async function loadLastfm() {
+      try {
+        const response = await fetch(buildApiUrl(), {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (data?.error) {
+          throw new Error(data.message || "Last.fm API error");
+        }
+
+        const tracks = normalizeTracks(data);
+        const track = getNewestTrack(tracks);
+
+        if (!track) {
+          throw new Error("No recent track found");
+        }
+
+        renderTrack(track);
+      } catch (error) {
+        statusEl.textContent = "last.fm unavailable";
+        statusEl.classList.remove("loading");
+        statusEl.classList.add("error");
+        songEl.textContent = "could not load song";
+        artistEl.textContent = "";
+        albumEl.textContent = "";
+        coverEl.src = FALLBACK_COVER;
+        requestAnimationFrame(sendHeight);
+      }
+    }
+
+    loadLastfm();
+    setInterval(loadLastfm, 15000);
+
+    window.addEventListener("focus", loadLastfm);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) loadLastfm();
+    });
+    window.addEventListener("load", sendHeight);
+    window.addEventListener("resize", sendHeight);
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(sendHeight).observe(document.body);
+    }
+  </script>
 </body>
 </html>
