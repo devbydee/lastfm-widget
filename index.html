@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     :root {
       --cream: #eee9dc;
@@ -11,11 +12,13 @@
       --line: rgba(139, 71, 65, .22);
     }
 
-    html.dark {
-      --cream: #262220;
-      --red: #d3aaa5;
-      --soft-red: #a9827e;
-      --line: rgba(211, 170, 165, .2);
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --cream: #262220;
+        --red: #d3aaa5;
+        --soft-red: #a9827e;
+        --line: rgba(211, 170, 165, .2);
+      }
     }
 
     * {
@@ -26,9 +29,7 @@
     html,
     body {
       width: 100%;
-      min-height: 100%;
       margin: 0;
-      overflow: hidden;
       background: transparent;
     }
 
@@ -44,42 +45,31 @@
       text-decoration: none;
     }
 
-    .lastfm-widget {
+    .widget {
+      width: 100%;
+    }
+
+    .now {
       display: grid;
       grid-template-columns: 52px minmax(0, 1fr);
       gap: 8px;
       align-items: center;
-      width: 100%;
-      min-width: 0;
+      margin-bottom: 11px;
     }
 
-    .cover-wrap {
+    .cover {
       width: 52px;
       height: 52px;
-      overflow: hidden;
-      background: var(--cream);
-      outline: 1px solid var(--line);
-      outline-offset: -1px;
-    }
-
-    .cover-wrap img {
-      display: block;
-      width: 100%;
-      height: 100%;
       object-fit: cover;
+      display: block;
       filter: grayscale(.2) sepia(.22) saturate(.72) brightness(.98) contrast(.96);
     }
 
-    html.dark .cover-wrap img {
-      filter: grayscale(.28) sepia(.18) saturate(.62) brightness(.72) contrast(.98);
-    }
-
-    .track-info {
+    .now-info {
       min-width: 0;
-      overflow: hidden;
     }
 
-    .now-playing {
+    .status {
       display: inline-block;
       margin-bottom: 3px;
       padding: 1px 4px 2px;
@@ -87,14 +77,11 @@
       color: var(--cream);
       font-size: 8px;
       line-height: 1;
-      white-space: nowrap;
     }
 
     .song {
       display: block;
-      max-width: 100%;
       overflow: hidden;
-      color: var(--red);
       font-size: 11px;
       font-weight: 700;
       line-height: 1.12;
@@ -105,11 +92,10 @@
     .artist,
     .album {
       display: block;
-      max-width: 100%;
       overflow: hidden;
       color: var(--soft-red);
       font-size: 9px;
-      line-height: 1.12;
+      line-height: 1.15;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -122,42 +108,107 @@
       margin-top: 1px;
     }
 
+    .recent-label {
+      margin: 0 0 5px;
+      color: var(--soft-red);
+      font-size: 9px;
+    }
+
+    .recent {
+      display: grid;
+      gap: 6px;
+    }
+
+    .recent-track {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      gap: 7px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .recent-cover {
+      display: block;
+      width: 34px;
+      height: 34px;
+      object-fit: cover;
+      filter: grayscale(.2) sepia(.22) saturate(.72) brightness(.98) contrast(.96);
+    }
+
+    .recent-info {
+      min-width: 0;
+    }
+
+    .recent-song {
+      display: block;
+      overflow: hidden;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .recent-artist {
+      display: block;
+      margin-top: 1px;
+      overflow: hidden;
+      color: var(--soft-red);
+      font-size: 9px;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .time {
+      color: var(--soft-red);
+      font-size: 8px;
+      white-space: nowrap;
+    }
+
     .loading,
     .error {
-      background: transparent;
       color: var(--soft-red);
-      padding: 0;
+      font-size: 9px;
     }
   </style>
 </head>
 
 <body>
-  <a id="lastfm-link" href="https://www.last.fm/user/deofi" target="_blank" rel="noopener noreferrer">
-    <div class="lastfm-widget">
-      <div class="cover-wrap">
-        <img id="cover" src="https://cdn.imgchest.com/files/e47cd02d0ccb.gif" alt="album cover">
-      </div>
+  <div class="widget">
+    <div id="loading" class="loading">loading last.fm...</div>
 
-      <div class="track-info">
-        <div id="status" class="now-playing loading">loading last.fm...</div>
-        <div id="song" class="song">...</div>
-        <div id="artist" class="artist"></div>
-        <div id="album" class="album"></div>
+    <a id="now-link" class="now" href="#" target="_blank" rel="noopener noreferrer" hidden>
+      <img id="now-cover" class="cover" alt="album cover">
+
+      <div class="now-info">
+        <span id="status" class="status">now playing</span>
+        <span id="now-song" class="song"></span>
+        <span id="now-artist" class="artist"></span>
+        <span id="now-album" class="album"></span>
       </div>
+    </a>
+
+    <div id="recent-wrap" hidden>
+      <div class="recent-label">recently</div>
+      <div id="recent" class="recent"></div>
     </div>
-  </a>
+  </div>
 
   <script>
     const LASTFM_USERNAME = "deofi";
-    const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
+    const LASTFM_API_KEY = "YOUR_EXISTING_API_KEY";
     const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
 
-    const coverEl = document.getElementById("cover");
+    const loadingEl = document.getElementById("loading");
+    const nowLink = document.getElementById("now-link");
+    const nowCover = document.getElementById("now-cover");
     const statusEl = document.getElementById("status");
-    const songEl = document.getElementById("song");
-    const artistEl = document.getElementById("artist");
-    const albumEl = document.getElementById("album");
-    const linkEl = document.getElementById("lastfm-link");
+    const nowSong = document.getElementById("now-song");
+    const nowArtist = document.getElementById("now-artist");
+    const nowAlbum = document.getElementById("now-album");
+    const recentWrap = document.getElementById("recent-wrap");
+    const recentEl = document.getElementById("recent");
 
     function buildApiUrl() {
       const params = new URLSearchParams({
@@ -165,70 +216,114 @@
         user: LASTFM_USERNAME,
         api_key: LASTFM_API_KEY,
         format: "json",
-        limit: "5"
+        limit: "8"
       });
 
-      params.set("_", String(Date.now()));
+      params.set("_", Date.now());
+
       return "https://ws.audioscrobbler.com/2.0/?" + params.toString();
     }
 
-    function getBestImage(images) {
-      if (!Array.isArray(images)) return "";
+    function normalizeTracks(data) {
+      const tracks = data?.recenttracks?.track;
+
+      if (!tracks) return [];
+
+      return Array.isArray(tracks) ? tracks : [tracks];
+    }
+
+    function getImage(track) {
+      const images = track?.image;
+
+      if (!Array.isArray(images)) return FALLBACK_COVER;
 
       const usable = images
-        .map(image => image && image["#text"])
+        .map(image => image?.["#text"])
         .filter(Boolean);
 
-      return usable[usable.length - 1] || "";
+      return usable[usable.length - 1] || FALLBACK_COVER;
     }
 
-    function normalizeTracks(data) {
-      const raw = data?.recenttracks?.track;
-      if (!raw) return [];
-      return Array.isArray(raw) ? raw : [raw];
+    function getArtist(track) {
+      return track?.artist?.["#text"] || track?.artist?.name || "unknown artist";
     }
 
-    function getNewestTrack(tracks) {
-      if (!tracks.length) return null;
+    function timeAgo(track) {
+      const uts = Number(track?.date?.uts);
 
-      const nowPlaying = tracks.find(
-        track => track?.["@attr"]?.nowplaying === "true"
-      );
+      if (!uts) return "";
 
-      if (nowPlaying) return nowPlaying;
+      const seconds = Math.max(0, Math.floor(Date.now() / 1000) - uts);
 
-      return [...tracks].sort((a, b) => {
-        const aTime = Number(a?.date?.uts || 0);
-        const bTime = Number(b?.date?.uts || 0);
-        return bTime - aTime;
-      })[0] || null;
+      if (seconds < 60) return "now";
+
+      const minutes = Math.floor(seconds / 60);
+
+      if (minutes < 60) return minutes + "m";
+
+      const hours = Math.floor(minutes / 60);
+
+      if (hours < 24) return hours + "h";
+
+      const days = Math.floor(hours / 24);
+
+      return days + "d";
     }
 
-    function renderTrack(track) {
-      const isNowPlaying = track?.["@attr"]?.nowplaying === "true";
-      const song = track?.name || "unknown song";
-      const artist = track?.artist?.["#text"] || track?.artist?.name || "unknown artist";
-      const album = track?.album?.["#text"] || "";
-      const image = getBestImage(track?.image);
+    function renderNow(track, isPlaying) {
+      nowLink.hidden = false;
+      nowLink.href = track?.url || "https://www.last.fm/user/" + LASTFM_USERNAME;
 
-      statusEl.textContent = isNowPlaying ? "now playing" : "last played";
-      statusEl.classList.remove("loading", "error");
-      songEl.textContent = song;
-      artistEl.textContent = artist;
-      albumEl.textContent = album;
-      coverEl.src = image || FALLBACK_COVER;
-      linkEl.href = track?.url || ("https://www.last.fm/user/" + LASTFM_USERNAME);
+      nowCover.src = getImage(track);
+      nowSong.textContent = track?.name || "unknown song";
+      nowArtist.textContent = getArtist(track);
+      nowAlbum.textContent = track?.album?.["#text"] || "";
 
+      statusEl.textContent = isPlaying ? "now playing" : "last played";
+    }
+
+    function renderRecent(tracks) {
+      recentEl.innerHTML = "";
+
+      tracks.slice(0, 6).forEach(track => {
+        const link = document.createElement("a");
+        link.className = "recent-track";
+        link.href = track?.url || "https://www.last.fm/user/" + LASTFM_USERNAME;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        const cover = document.createElement("img");
+        cover.className = "recent-cover";
+        cover.src = getImage(track);
+        cover.alt = "";
+
+        const info = document.createElement("div");
+        info.className = "recent-info";
+
+        const song = document.createElement("span");
+        song.className = "recent-song";
+        song.textContent = track?.name || "unknown song";
+
+        const artist = document.createElement("span");
+        artist.className = "recent-artist";
+        artist.textContent = getArtist(track);
+
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = timeAgo(track);
+
+        info.append(song, artist);
+        link.append(cover, info, time);
+        recentEl.appendChild(link);
+      });
+
+      recentWrap.hidden = tracks.length === 0;
     }
 
     async function loadLastfm() {
       try {
         const response = await fetch(buildApiUrl(), {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            Accept: "application/json"
-          }
+          cache: "no-store"
         });
 
         if (!response.ok) {
@@ -238,34 +333,46 @@
         const data = await response.json();
 
         if (data?.error) {
-          throw new Error(data.message || "Last.fm API error");
+          throw new Error(data.message || "Last.fm error");
         }
 
         const tracks = normalizeTracks(data);
-        const track = getNewestTrack(tracks);
 
-        if (!track) {
-          throw new Error("No recent track found");
+        if (!tracks.length) {
+          throw new Error("No tracks");
         }
 
-        renderTrack(track);
+        const first = tracks[0];
+        const isPlaying = first?.["@attr"]?.nowplaying === "true";
+
+        renderNow(first, isPlaying);
+
+        const recentTracks = isPlaying
+          ? tracks.slice(1)
+          : tracks.slice(1);
+
+        renderRecent(recentTracks);
+
+        loadingEl.hidden = true;
       } catch (error) {
-        statusEl.textContent = "last.fm unavailable";
-        statusEl.classList.remove("loading");
-        statusEl.classList.add("error");
-        songEl.textContent = "could not load song";
-        artistEl.textContent = "";
-        albumEl.textContent = "";
-        coverEl.src = FALLBACK_COVER;
-        }
+        loadingEl.hidden = false;
+        loadingEl.className = "error";
+        loadingEl.textContent = "last.fm unavailable";
+        nowLink.hidden = true;
+        recentWrap.hidden = true;
+      }
     }
 
     loadLastfm();
+
     setInterval(loadLastfm, 15000);
 
     window.addEventListener("focus", loadLastfm);
+
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) loadLastfm();
+      if (!document.hidden) {
+        loadLastfm();
+      }
     });
   </script>
 </body>
