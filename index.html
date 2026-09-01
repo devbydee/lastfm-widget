@@ -37,8 +37,6 @@ body {
 body {
   color: var(--red);
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 9px;
-  line-height: 1.15;
   overflow: hidden;
 }
 
@@ -48,7 +46,7 @@ a {
 }
 
 .widget {
-  width: 128px;
+  width: 210px;
   max-width: 100%;
 }
 
@@ -57,92 +55,61 @@ a {
   width: 100%;
 }
 
-.cover {
-  display: block;
-  width: 128px;
-  max-width: 100%;
-  height: 128px;
-  object-fit: cover;
-  filter:
-    grayscale(.15)
-    sepia(.18)
-    saturate(.78)
-    brightness(.98)
-    contrast(.96);
-}
-
-.info {
-  width: 100%;
-  padding-top: 5px;
-}
-
 .top {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 4px;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
 }
 
 .status {
   display: inline-block;
-  flex-shrink: 0;
-  padding: 2px 4px 3px;
+  width: max-content;
+  padding: 2px 5px 3px;
   background: var(--red);
   color: var(--cream);
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .time {
-  min-width: 0;
   overflow: hidden;
   color: var(--soft-red);
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-line {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .song {
-  display: block;
-  width: 100%;
-  overflow: hidden;
   color: var(--red);
-  font-size: 10px;
   font-weight: 700;
-  line-height: 1.1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.dash {
+  color: var(--soft-red);
 }
 
 .artist {
-  display: block;
-  width: 100%;
-  margin-top: 2px;
-  overflow: hidden;
   color: var(--soft-red);
-  font-size: 8px;
-  line-height: 1.1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.album {
-  display: block;
-  width: 100%;
-  margin-top: 2px;
-  overflow: hidden;
-  color: var(--soft-red);
-  font-size: 7px;
-  line-height: 1.1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .loading,
 .error {
   color: var(--soft-red);
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1.2;
 }
 </style>
@@ -165,30 +132,18 @@ a {
     hidden
   >
 
-    <img
-      id="cover"
-      class="cover"
-      alt="album cover"
-    >
+    <div class="top">
+      <span id="status" class="status">
+        listening to
+      </span>
 
-    <div class="info">
+      <span id="time" class="time"></span>
+    </div>
 
-      <div class="top">
-
-        <span id="status" class="status">
-          playing
-        </span>
-
-        <span id="time" class="time"></span>
-
-      </div>
-
+    <div class="track-line">
       <span id="song" class="song"></span>
-
+      <span class="dash"> — </span>
       <span id="artist" class="artist"></span>
-
-      <span id="album" class="album"></span>
-
     </div>
 
   </a>
@@ -198,16 +153,13 @@ a {
 <script>
 const LASTFM_USERNAME = "deofi";
 const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
-const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
 
 const loading = document.getElementById("loading");
 const track = document.getElementById("track");
-const cover = document.getElementById("cover");
 const status = document.getElementById("status");
 const time = document.getElementById("time");
 const song = document.getElementById("song");
 const artist = document.getElementById("artist");
-const album = document.getElementById("album");
 
 function apiUrl() {
   const params = new URLSearchParams({
@@ -221,20 +173,6 @@ function apiUrl() {
   params.set("_", Date.now());
 
   return "https://ws.audioscrobbler.com/2.0/?" + params;
-}
-
-function imageFor(item) {
-  const images = item?.image;
-
-  if (!Array.isArray(images)) {
-    return FALLBACK_COVER;
-  }
-
-  const usable = images
-    .map(image => image?.["#text"])
-    .filter(Boolean);
-
-  return usable[usable.length - 1] || FALLBACK_COVER;
 }
 
 function artistFor(item) {
@@ -311,8 +249,6 @@ async function loadLastfm() {
       item?.url ||
       `https://www.last.fm/user/${LASTFM_USERNAME}`;
 
-    cover.src = imageFor(item);
-
     song.textContent =
       item?.name ||
       "unknown song";
@@ -320,13 +256,9 @@ async function loadLastfm() {
     artist.textContent =
       artistFor(item);
 
-    album.textContent =
-      item?.album?.["#text"] ||
-      "";
-
     status.textContent =
       playing
-        ? "now playing"
+        ? "listening to"
         : "last played";
 
     time.textContent =
@@ -347,24 +279,15 @@ async function loadLastfm() {
 
 loadLastfm();
 
-setInterval(
-  loadLastfm,
-  15000
-);
+setInterval(loadLastfm, 15000);
 
-window.addEventListener(
-  "focus",
-  loadLastfm
-);
+window.addEventListener("focus", loadLastfm);
 
-document.addEventListener(
-  "visibilitychange",
-  () => {
-    if (!document.hidden) {
-      loadLastfm();
-    }
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    loadLastfm();
   }
-);
+});
 </script>
 
 </body>
