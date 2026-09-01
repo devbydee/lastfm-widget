@@ -1,414 +1,381 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    :root {
-      --cream: #eee9dc;
-      --red: #8b4741;
-      --soft-red: #a06d68;
-      --line: rgba(139, 71, 65, .22);
-    }
+<style>
+:root {
+  --cream: #eee9dc;
+  --red: #8b4741;
+  --soft-red: #a06d68;
+}
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --cream: #262220;
-        --red: #d3aaa5;
-        --soft-red: #a9827e;
-        --line: rgba(211, 170, 165, .2);
-      }
-    }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #262220;
+    --red: #d3aaa5;
+    --soft-red: #a9827e;
+  }
+}
 
-    * {
-      box-sizing: border-box;
-      cursor: url("https://cdn.cursors-4u.net/previews/tiny-grey-pointer-544443a3-32.webp") 32 32, auto !important;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  cursor: url("https://cdn.cursors-4u.net/previews/tiny-grey-pointer-544443a3-32.webp") 32 32, auto !important;
+}
 
-    html,
-    body {
-      width: 100%;
-      margin: 0;
-      background: transparent;
-    }
+html,
+body {
+  width: 100%;
+  margin: 0;
+  background: transparent;
+}
 
-    body {
-      color: var(--red);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 10px;
-      line-height: 1.2;
-    }
+body {
+  color: var(--red);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.15;
+}
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-    .widget {
-      width: 100%;
-    }
+.widget {
+  width: 100%;
+}
 
-    .now {
-      display: grid;
-      grid-template-columns: 52px minmax(0, 1fr);
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 11px;
-    }
+.track {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 5px;
+  align-items: center;
+  width: 100%;
+}
 
-    .cover {
-      display: block;
-      width: 52px;
-      height: 52px;
-      object-fit: cover;
-      filter: grayscale(.2) sepia(.22) saturate(.72) brightness(.98) contrast(.96);
-    }
+.cover {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  filter:
+    grayscale(.15)
+    sepia(.18)
+    saturate(.78)
+    brightness(.98)
+    contrast(.96);
+}
 
-    .now-info {
-      min-width: 0;
-    }
+.info {
+  min-width: 0;
+}
 
-    .status {
-      display: inline-block;
-      margin-bottom: 3px;
-      padding: 1px 4px 2px;
-      background: var(--red);
-      color: var(--cream);
-      font-size: 8px;
-      line-height: 1;
-    }
+.top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin-bottom: 2px;
+}
 
-    .song {
-      display: block;
-      overflow: hidden;
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 1.12;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+.status {
+  flex-shrink: 0;
+  padding: 1px 3px 2px;
+  background: var(--red);
+  color: var(--cream);
+  font-size: 7px;
+  line-height: 1;
+}
 
-    .artist,
-    .album {
-      display: block;
-      overflow: hidden;
-      color: var(--soft-red);
-      font-size: 9px;
-      line-height: 1.15;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+.time {
+  overflow: hidden;
+  color: var(--soft-red);
+  font-size: 7px;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-    .artist {
-      margin-top: 2px;
-    }
+.song {
+  display: block;
+  overflow: hidden;
+  color: var(--red);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-    .album {
-      margin-top: 1px;
-    }
+.artist {
+  display: block;
+  margin-top: 1px;
+  overflow: hidden;
+  color: var(--soft-red);
+  font-size: 8px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-    .recent-label {
-      margin: 0 0 5px;
-      color: var(--soft-red);
-      font-size: 9px;
-    }
+.album {
+  display: block;
+  margin-top: 1px;
+  overflow: hidden;
+  color: var(--soft-red);
+  font-size: 7px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-    .recent {
-      display: grid;
-      gap: 6px;
-    }
-
-    .recent-track {
-      display: grid;
-      grid-template-columns: 34px minmax(0, 1fr) auto;
-      gap: 7px;
-      align-items: center;
-      min-width: 0;
-    }
-
-    .recent-cover {
-      display: block;
-      width: 34px;
-      height: 34px;
-      object-fit: cover;
-      filter: grayscale(.2) sepia(.22) saturate(.72) brightness(.98) contrast(.96);
-    }
-
-    .recent-info {
-      min-width: 0;
-    }
-
-    .recent-song {
-      display: block;
-      overflow: hidden;
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1.1;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .recent-artist {
-      display: block;
-      margin-top: 1px;
-      overflow: hidden;
-      color: var(--soft-red);
-      font-size: 9px;
-      line-height: 1.1;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .time {
-      color: var(--soft-red);
-      font-size: 8px;
-      white-space: nowrap;
-    }
-
-    .loading,
-    .error {
-      color: var(--soft-red);
-      font-size: 9px;
-    }
-  </style>
+.loading,
+.error {
+  color: var(--soft-red);
+  font-size: 8px;
+  line-height: 1.2;
+}
+</style>
 </head>
 
 <body>
-  <div class="widget">
-    <div id="loading" class="loading">loading last.fm...</div>
 
-    <a
-      id="now-link"
-      class="now"
-      href="#"
-      target="_blank"
-      rel="noopener noreferrer"
-      hidden
-    >
-      <img id="now-cover" class="cover" alt="album cover">
+<div class="widget">
 
-      <div class="now-info">
-        <span id="status" class="status">now playing</span>
-        <span id="now-song" class="song"></span>
-        <span id="now-artist" class="artist"></span>
-        <span id="now-album" class="album"></span>
-      </div>
-    </a>
-
-    <div id="recent-wrap" hidden>
-      <div class="recent-label">recently</div>
-      <div id="recent" class="recent"></div>
-    </div>
+  <div
+    id="loading"
+    class="loading"
+  >
+    loading...
   </div>
 
-  <script>
-    const LASTFM_USERNAME = "deofi";
-    const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
-    const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
+  <a
+    id="track"
+    class="track"
+    href="#"
+    target="_blank"
+    rel="noopener noreferrer"
+    hidden
+  >
 
-    const loadingEl = document.getElementById("loading");
-    const nowLink = document.getElementById("now-link");
-    const nowCover = document.getElementById("now-cover");
-    const statusEl = document.getElementById("status");
-    const nowSong = document.getElementById("now-song");
-    const nowArtist = document.getElementById("now-artist");
-    const nowAlbum = document.getElementById("now-album");
-    const recentWrap = document.getElementById("recent-wrap");
-    const recentEl = document.getElementById("recent");
+    <img
+      id="cover"
+      class="cover"
+      alt="album cover"
+    >
 
-    function buildApiUrl() {
-      const params = new URLSearchParams({
-        method: "user.getrecenttracks",
-        user: LASTFM_USERNAME,
-        api_key: LASTFM_API_KEY,
-        format: "json",
-        limit: "8"
-      });
+    <div class="info">
 
-      params.set("_", Date.now());
+      <div class="top">
+        <span
+          id="status"
+          class="status"
+        >
+          playing
+        </span>
 
-      return "https://ws.audioscrobbler.com/2.0/?" + params.toString();
-    }
+        <span
+          id="time"
+          class="time"
+        ></span>
+      </div>
 
-    function normalizeTracks(data) {
-      const tracks = data?.recenttracks?.track;
+      <span
+        id="song"
+        class="song"
+      ></span>
 
-      if (!tracks) {
-        return [];
-      }
+      <span
+        id="artist"
+        class="artist"
+      ></span>
 
-      return Array.isArray(tracks) ? tracks : [tracks];
-    }
+      <span
+        id="album"
+        class="album"
+      ></span>
 
-    function getImage(track) {
-      const images = track?.image;
+    </div>
 
-      if (!Array.isArray(images)) {
-        return FALLBACK_COVER;
-      }
+  </a>
 
-      const usable = images
-        .map(image => image?.["#text"])
-        .filter(Boolean);
+</div>
 
-      return usable[usable.length - 1] || FALLBACK_COVER;
-    }
+<script>
+const LASTFM_USERNAME = "deofi";
+const LASTFM_API_KEY = "YOUR_LASTFM_API_KEY";
+const FALLBACK_COVER = "https://cdn.imgchest.com/files/e47cd02d0ccb.gif";
 
-    function getArtist(track) {
-      return (
-        track?.artist?.["#text"] ||
-        track?.artist?.name ||
-        "unknown artist"
-      );
-    }
+const loading = document.getElementById("loading");
+const track = document.getElementById("track");
+const cover = document.getElementById("cover");
+const status = document.getElementById("status");
+const time = document.getElementById("time");
+const song = document.getElementById("song");
+const artist = document.getElementById("artist");
+const album = document.getElementById("album");
 
-    function timeAgo(track) {
-      const uts = Number(track?.date?.uts);
+function apiUrl() {
+  const params = new URLSearchParams({
+    method: "user.getrecenttracks",
+    user: LASTFM_USERNAME,
+    api_key: LASTFM_API_KEY,
+    format: "json",
+    limit: "1"
+  });
 
-      if (!uts) {
-        return "";
-      }
+  params.set("_", Date.now());
 
-      const seconds = Math.max(
-        0,
-        Math.floor(Date.now() / 1000) - uts
-      );
+  return "https://ws.audioscrobbler.com/2.0/?" + params;
+}
 
-      if (seconds < 60) {
-        return "now";
-      }
+function imageFor(item) {
+  const images = item?.image;
 
-      const minutes = Math.floor(seconds / 60);
+  if (!Array.isArray(images)) {
+    return FALLBACK_COVER;
+  }
 
-      if (minutes < 60) {
-        return minutes + "m";
-      }
+  const usable = images
+    .map(image => image?.["#text"])
+    .filter(Boolean);
 
-      const hours = Math.floor(minutes / 60);
+  return usable[usable.length - 1] || FALLBACK_COVER;
+}
 
-      if (hours < 24) {
-        return hours + "h";
-      }
+function artistFor(item) {
+  return (
+    item?.artist?.["#text"] ||
+    item?.artist?.name ||
+    "unknown artist"
+  );
+}
 
-      const days = Math.floor(hours / 24);
+function ago(item) {
+  const uts = Number(item?.date?.uts);
 
-      return days + "d";
-    }
+  if (!uts) {
+    return "";
+  }
 
-    function renderNow(track, isPlaying) {
-      nowLink.hidden = false;
-      nowLink.href =
-        track?.url ||
-        "https://www.last.fm/user/" + LASTFM_USERNAME;
+  const seconds =
+    Math.max(
+      0,
+      Math.floor(Date.now() / 1000) - uts
+    );
 
-      nowCover.src = getImage(track);
-      nowSong.textContent = track?.name || "unknown song";
-      nowArtist.textContent = getArtist(track);
-      nowAlbum.textContent = track?.album?.["#text"] || "";
+  if (seconds < 60) {
+    return "just now";
+  }
 
-      statusEl.textContent = isPlaying
-        ? "now playing"
-        : "last played";
-    }
+  const minutes = Math.floor(seconds / 60);
 
-    function renderRecent(tracks) {
-      recentEl.innerHTML = "";
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
 
-      tracks.slice(0, 6).forEach(track => {
-        const link = document.createElement("a");
-        link.className = "recent-track";
-        link.href =
-          track?.url ||
-          "https://www.last.fm/user/" + LASTFM_USERNAME;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
+  const hours = Math.floor(minutes / 60);
 
-        const cover = document.createElement("img");
-        cover.className = "recent-cover";
-        cover.src = getImage(track);
-        cover.alt = "";
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
 
-        const info = document.createElement("div");
-        info.className = "recent-info";
+  const days = Math.floor(hours / 24);
 
-        const song = document.createElement("span");
-        song.className = "recent-song";
-        song.textContent = track?.name || "unknown song";
+  return `${days}d ago`;
+}
 
-        const artist = document.createElement("span");
-        artist.className = "recent-artist";
-        artist.textContent = getArtist(track);
-
-        const time = document.createElement("span");
-        time.className = "time";
-        time.textContent = timeAgo(track);
-
-        info.append(song, artist);
-        link.append(cover, info, time);
-        recentEl.appendChild(link);
-      });
-
-      recentWrap.hidden = tracks.length === 0;
-    }
-
-    async function loadLastfm() {
-      try {
-        const response = await fetch(buildApiUrl(), {
-          cache: "no-store"
-        });
-
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
-
-        const data = await response.json();
-
-        if (data?.error) {
-          throw new Error(
-            data.message || "Last.fm error"
-          );
-        }
-
-        const tracks = normalizeTracks(data);
-
-        if (!tracks.length) {
-          throw new Error("No tracks");
-        }
-
-        const first = tracks[0];
-
-        const isPlaying =
-          first?.["@attr"]?.nowplaying === "true";
-
-        renderNow(first, isPlaying);
-
-        const recentTracks = tracks.slice(1);
-
-        renderRecent(recentTracks);
-
-        loadingEl.hidden = true;
-      } catch (error) {
-        loadingEl.hidden = false;
-        loadingEl.className = "error";
-        loadingEl.textContent = "last.fm unavailable";
-
-        nowLink.hidden = true;
-        recentWrap.hidden = true;
-      }
-    }
-
-    loadLastfm();
-
-    setInterval(loadLastfm, 15000);
-
-    window.addEventListener("focus", loadLastfm);
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) {
-        loadLastfm();
-      }
+async function loadLastfm() {
+  try {
+    const response = await fetch(apiUrl(), {
+      cache: "no-store"
     });
-  </script>
+
+    if (!response.ok) {
+      throw new Error();
+    }
+
+    const data = await response.json();
+
+    if (data?.error) {
+      throw new Error();
+    }
+
+    let item = data?.recenttracks?.track;
+
+    if (Array.isArray(item)) {
+      item = item[0];
+    }
+
+    if (!item) {
+      throw new Error();
+    }
+
+    const playing =
+      item?.["@attr"]?.nowplaying === "true";
+
+    track.href =
+      item?.url ||
+      `https://www.last.fm/user/${LASTFM_USERNAME}`;
+
+    cover.src = imageFor(item);
+
+    song.textContent =
+      item?.name ||
+      "unknown song";
+
+    artist.textContent =
+      artistFor(item);
+
+    album.textContent =
+      item?.album?.["#text"] ||
+      "";
+
+    status.textContent =
+      playing
+        ? "now"
+        : "last";
+
+    time.textContent =
+      playing
+        ? "playing"
+        : ago(item);
+
+    loading.hidden = true;
+    track.hidden = false;
+
+  } catch {
+    loading.hidden = false;
+    loading.className = "error";
+    loading.textContent = "last.fm unavailable";
+    track.hidden = true;
+  }
+}
+
+loadLastfm();
+
+setInterval(
+  loadLastfm,
+  15000
+);
+
+window.addEventListener(
+  "focus",
+  loadLastfm
+);
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (!document.hidden) {
+      loadLastfm();
+    }
+  }
+);
+</script>
+
 </body>
 </html>
