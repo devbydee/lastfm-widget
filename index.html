@@ -38,6 +38,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 9px;
   line-height: 1.15;
+  overflow: hidden;
 }
 
 a {
@@ -50,16 +51,14 @@ a {
 }
 
 .track {
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
-  gap: 5px;
-  align-items: center;
+  display: block;
   width: 100%;
 }
 
 .cover {
-  width: 38px;
-  height: 38px;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
   object-fit: cover;
   filter:
     grayscale(.15)
@@ -70,20 +69,21 @@ a {
 }
 
 .info {
-  min-width: 0;
+  width: 100%;
+  padding-top: 5px;
 }
 
 .top {
   display: flex;
   align-items: center;
   gap: 4px;
-  min-width: 0;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .status {
+  display: inline-block;
   flex-shrink: 0;
-  padding: 1px 3px 2px;
+  padding: 2px 4px 3px;
   background: var(--red);
   color: var(--cream);
   font-size: 7px;
@@ -91,6 +91,7 @@ a {
 }
 
 .time {
+  min-width: 0;
   overflow: hidden;
   color: var(--soft-red);
   font-size: 7px;
@@ -101,9 +102,10 @@ a {
 
 .song {
   display: block;
+  width: 100%;
   overflow: hidden;
   color: var(--red);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1.1;
   text-overflow: ellipsis;
@@ -112,7 +114,8 @@ a {
 
 .artist {
   display: block;
-  margin-top: 1px;
+  width: 100%;
+  margin-top: 2px;
   overflow: hidden;
   color: var(--soft-red);
   font-size: 8px;
@@ -123,7 +126,8 @@ a {
 
 .album {
   display: block;
-  margin-top: 1px;
+  width: 100%;
+  margin-top: 2px;
   overflow: hidden;
   color: var(--soft-red);
   font-size: 7px;
@@ -170,6 +174,7 @@ a {
     <div class="info">
 
       <div class="top">
+
         <span
           id="status"
           class="status"
@@ -181,6 +186,7 @@ a {
           id="time"
           class="time"
         ></span>
+
       </div>
 
       <span
@@ -261,11 +267,10 @@ function ago(item) {
     return "";
   }
 
-  const seconds =
-    Math.max(
-      0,
-      Math.floor(Date.now() / 1000) - uts
-    );
+  const seconds = Math.max(
+    0,
+    Math.floor(Date.now() / 1000) - uts
+  );
 
   if (seconds < 60) {
     return "just now";
@@ -336,12 +341,12 @@ async function loadLastfm() {
 
     status.textContent =
       playing
-        ? "now"
-        : "last";
+        ? "now playing"
+        : "last played";
 
     time.textContent =
       playing
-        ? "playing"
+        ? ""
         : ago(item);
 
     loading.hidden = true;
