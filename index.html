@@ -46,8 +46,15 @@ a {
 }
 
 .widget {
-  width: 210px;
+  width: 260px;
   max-width: 100%;
+}
+
+.loading,
+.error {
+  color: var(--soft-red);
+  font-size: 10px;
+  line-height: 1.3;
 }
 
 .track {
@@ -55,16 +62,18 @@ a {
   width: 100%;
 }
 
-.top {
+.track-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 5px;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 7px;
 }
 
 .status {
   display: inline-block;
+  flex: 0 0 auto;
   width: max-content;
   padding: 2px 5px 3px;
   background: var(--red);
@@ -75,10 +84,12 @@ a {
 }
 
 .time {
+  min-width: 0;
   overflow: hidden;
   color: var(--soft-red);
   font-size: 8px;
   line-height: 1;
+  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -87,15 +98,14 @@ a {
   display: block;
   width: 100%;
   overflow: hidden;
-  font-size: 10px;
-  line-height: 1.2;
+  font-size: 12px;
+  line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .song {
   color: var(--red);
-  font-weight: 700;
 }
 
 .dash {
@@ -106,11 +116,50 @@ a {
   color: var(--soft-red);
 }
 
-.loading,
-.error {
+.lastfm-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
   color: var(--soft-red);
   font-size: 9px;
-  line-height: 1.2;
+  line-height: 1;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.lastfm-link:hover,
+.lastfm-link:focus-visible {
+  color: var(--red);
+  outline: none;
+}
+
+.lastfm-icon {
+  display: block;
+  width: 9px;
+  height: 9px;
+  object-fit: contain;
+  opacity: .7;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lastfm-icon {
+    filter:
+      brightness(0)
+      saturate(100%)
+      invert(78%)
+      sepia(13%)
+      saturate(463%)
+      hue-rotate(317deg)
+      brightness(89%)
+      contrast(88%);
+  }
+}
+
+.lastfm-link:hover .lastfm-icon,
+.lastfm-link:focus-visible .lastfm-icon {
+  opacity: 1;
 }
 </style>
 </head>
@@ -119,34 +168,78 @@ a {
 
 <div class="widget">
 
-  <div id="loading" class="loading">
-    loading...
+  <div
+    id="loading"
+    class="loading"
+  >
+    checking last.fm...
   </div>
 
-  <a
-    id="track"
-    class="track"
-    href="#"
-    target="_blank"
-    rel="noopener noreferrer"
+  <div
+    id="content"
     hidden
   >
 
-    <div class="top">
-      <span id="status" class="status">
-        listening to
-      </span>
+    <a
+      id="track"
+      class="track"
+      href="https://www.last.fm/user/deofi"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
 
-      <span id="time" class="time"></span>
-    </div>
+      <div class="track-top">
 
-    <div class="track-line">
-      <span id="song" class="song"></span>
-      <span class="dash"> — </span>
-      <span id="artist" class="artist"></span>
-    </div>
+        <span
+          id="status"
+          class="status"
+        >
+          listening to
+        </span>
 
-  </a>
+        <span
+          id="time"
+          class="time"
+        ></span>
+
+      </div>
+
+      <div class="track-line">
+
+        <span
+          id="song"
+          class="song"
+        ></span>
+
+        <span class="dash">
+          —
+        </span>
+
+        <span
+          id="artist"
+          class="artist"
+        ></span>
+
+      </div>
+
+    </a>
+
+    <a
+      class="lastfm-link"
+      href="https://www.last.fm/user/deofi"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      my last.fm
+
+      <img
+        class="lastfm-icon"
+        src="https://cdn-icons-png.flaticon.com/128/5247/5247475.png"
+        alt=""
+      >
+    </a>
+
+  </div>
 
 </div>
 
@@ -154,25 +247,43 @@ a {
 const LASTFM_USERNAME = "deofi";
 const LASTFM_API_KEY = "a2be517f739bcad9ea9b996940c97d0c";
 
-const loading = document.getElementById("loading");
-const track = document.getElementById("track");
-const status = document.getElementById("status");
-const time = document.getElementById("time");
-const song = document.getElementById("song");
-const artist = document.getElementById("artist");
+const loading =
+  document.getElementById("loading");
+
+const content =
+  document.getElementById("content");
+
+const track =
+  document.getElementById("track");
+
+const status =
+  document.getElementById("status");
+
+const time =
+  document.getElementById("time");
+
+const song =
+  document.getElementById("song");
+
+const artist =
+  document.getElementById("artist");
 
 function apiUrl() {
-  const params = new URLSearchParams({
-    method: "user.getrecenttracks",
-    user: LASTFM_USERNAME,
-    api_key: LASTFM_API_KEY,
-    format: "json",
-    limit: "1"
-  });
+  const params =
+    new URLSearchParams({
+      method: "user.getrecenttracks",
+      user: LASTFM_USERNAME,
+      api_key: LASTFM_API_KEY,
+      format: "json",
+      limit: "1"
+    });
 
   params.set("_", Date.now());
 
-  return "https://ws.audioscrobbler.com/2.0/?" + params;
+  return (
+    "https://ws.audioscrobbler.com/2.0/?" +
+    params
+  );
 }
 
 function artistFor(item) {
@@ -184,55 +295,67 @@ function artistFor(item) {
 }
 
 function ago(item) {
-  const uts = Number(item?.date?.uts);
+  const uts =
+    Number(item?.date?.uts);
 
   if (!uts) {
     return "";
   }
 
-  const seconds = Math.max(
-    0,
-    Math.floor(Date.now() / 1000) - uts
-  );
+  const seconds =
+    Math.max(
+      0,
+      Math.floor(Date.now() / 1000) - uts
+    );
 
   if (seconds < 60) {
     return "just now";
   }
 
-  const minutes = Math.floor(seconds / 60);
+  const minutes =
+    Math.floor(seconds / 60);
 
   if (minutes < 60) {
     return `${minutes}m ago`;
   }
 
-  const hours = Math.floor(minutes / 60);
+  const hours =
+    Math.floor(minutes / 60);
 
   if (hours < 24) {
     return `${hours}h ago`;
   }
 
-  const days = Math.floor(hours / 24);
+  const days =
+    Math.floor(hours / 24);
 
   return `${days}d ago`;
 }
 
 async function loadLastfm() {
   try {
-    const response = await fetch(apiUrl(), {
-      cache: "no-store"
-    });
+
+    const response =
+      await fetch(
+        apiUrl(),
+        {
+          cache: "no-store"
+        }
+      );
 
     if (!response.ok) {
       throw new Error();
     }
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     if (data?.error) {
       throw new Error();
     }
 
-    let item = data?.recenttracks?.track;
+    let item =
+      data?.recenttracks?.track;
 
     if (Array.isArray(item)) {
       item = item[0];
@@ -267,27 +390,40 @@ async function loadLastfm() {
         : ago(item);
 
     loading.hidden = true;
-    track.hidden = false;
+    content.hidden = false;
 
   } catch {
+
+    content.hidden = true;
+
     loading.hidden = false;
     loading.className = "error";
-    loading.textContent = "last.fm unavailable";
-    track.hidden = true;
+    loading.textContent =
+      "last.fm unavailable";
+
   }
 }
 
 loadLastfm();
 
-setInterval(loadLastfm, 15000);
+setInterval(
+  loadLastfm,
+  15000
+);
 
-window.addEventListener("focus", loadLastfm);
+window.addEventListener(
+  "focus",
+  loadLastfm
+);
 
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    loadLastfm();
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (!document.hidden) {
+      loadLastfm();
+    }
   }
-});
+);
 </script>
 
 </body>
